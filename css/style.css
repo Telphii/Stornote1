@@ -1,0 +1,12 @@
+body {
+    font-family: tahoma, serif;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#app {
+    margin: 100px;
+    display: flex;
+    justify-content: space-between;
+}
