@@ -8,7 +8,7 @@ body {
 #app {
     margin: 100px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .task-container {
@@ -26,6 +26,8 @@ body {
     border: 2px solid #540000;
     border-radius: 8px;
     background-color: #00b193;
+    padding: 10px;
+    margin: 0 10px;
 }
 
 .card {
@@ -34,6 +36,7 @@ body {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    background-color: #fff;
 }
 
 .card h3 {
@@ -50,19 +53,42 @@ body {
     margin: 5px 0;
 }
 
-.card input {
-    margin-right: 10px;
-}
-
-.card p {
-    font-size: 12px;
-    color: #555;
-}
-
 form {
     margin-bottom: 30px;
     padding: 22px;
     background-color: #fff;
     border-radius: 8px;
     border: 1px solid #ccc;
+    width: 300px;
+}
+
+form div {
+    margin-bottom: 10px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+form input {
+    width: 100%;
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #6c63ff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+form button:hover {
+    background-color: #5a54e6;
 }
