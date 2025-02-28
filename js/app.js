@@ -9,15 +9,67 @@ const TaskColumn = {
     <div class="column">
       <h2>Столбец {{ columnID }}</h2>
       <div v-for="(card, index) in taskCards" :key="index">
-        <div class="card">
-          <h3>{{ card.title }}</h3>
-          <ul>
-            <li v-for="(item, i) in card.list" :key="i">
-              {{ item.text }}
-            </li>
-          </ul>
-        </div>
+        <TaskCard
+          :taskTitle="card.title"
+          :taskItems="card.list"
+          :taskColumn="columnID"
+          :taskIndex="index"
+          :relocateTask="relocateTask"
+          :completionTime="card.completedAt"
+          :modifyTask="modifyTask"
+          :secondColumnTaskCount="taskColumns[1].taskCards.length"
+        ></TaskCard>
       </div>
+    </div>
+  `,
+};
+
+const TaskCard = {
+    props: {
+        taskTitle: String,
+        taskItems: Array,
+        taskColumn: Number,
+        taskIndex: Number,
+        relocateTask: Function,
+        completionTime: String,
+        modifyTask: Function,
+        secondColumnTaskCount: Number,
+    },
+    computed: {
+        completionPercentage() {
+            const finishedTasks = this.taskItems.filter(item => item.done).length;
+            return Math.floor((finishedTasks / this.taskItems.length) * 100);
+        },
+        isRestricted() {
+            return this.taskColumn === 1 && this.secondColumnTaskCount >= 5 && this.completionPercentage < 100;
+        }
+    },
+    methods: {
+        toggleTaskItem(index) {
+            if (this.isRestricted) return;
+            const finishedTasks = this.taskItems.filter(item => item.done).length;
+            const completed = Math.floor((finishedTasks / this.taskItems.length) * 100);
+            if (completed === 100 && !this.completionTime) {
+                const finishTimestamp = new Date().toLocaleString();
+                this.modifyTask(this.taskIndex, this.taskColumn, { completedAt: finishTimestamp });
+            }
+            if (this.taskColumn === 1 && completed > 50) {
+                this.relocateTask({ column: this.taskColumn, index: this.taskIndex }, 2);
+            } else if (this.taskColumn === 2 && completed === 100) {
+                this.relocateTask({ column: this.taskColumn, index: this.taskIndex }, 3);
+            }
+        },
+    },
+    template: `
+    <div class="card">
+      <h3>{{ taskTitle }}</h3>
+      <ul>
+        <li v-for="(item, index) in taskItems" :key="index">
+          <input type="checkbox" v-model="item.done" @change="toggleTaskItem(index)" :disabled="isRestricted || item.done"/>
+          {{ item.text }}
+        </li>
+      </ul>
+      <p v-if="completionPercentage === 100">Completed at: {{ completionTime }}</p>
     </div>
   `,
 };
@@ -65,10 +117,17 @@ const taskManager = createApp({
                 this.newTask.list.splice(index, 1);
             }
         },
+        relocateTask(from, to) {
+            const task = this.taskColumns[from.column - 1].taskCards.splice(from.index, 1)[0];
+            this.taskColumns[to - 1].taskCards.push(task);
+        },
+        modifyTask(index, column, updates) {
+            const task = this.taskColumns[column - 1].taskCards[index];
+            Object.assign(task, updates);
+        },
     },
     template: `
     <div class="task-container">
-      <!-- Форма для добавления новой задачи -->
       <form @submit.prevent="addTask">
         <div>
           <label for="task-title">Название задачи:</label>
@@ -83,7 +142,6 @@ const taskManager = createApp({
         <button type="submit">Добавить задачу</button>
       </form>
 
-      <!-- Отображение столбцов с задачами -->
       <div class="task-columns">
         <TaskColumn
           v-for="(column, index) in taskColumns"
@@ -97,4 +155,5 @@ const taskManager = createApp({
 });
 
 taskManager.component('TaskColumn', TaskColumn);
+taskManager.component('TaskCard', TaskCard);
 taskManager.mount('#app');
