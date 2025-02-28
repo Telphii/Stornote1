@@ -125,6 +125,19 @@ const taskManager = createApp({
             const task = this.taskColumns[column - 1].taskCards[index];
             Object.assign(task, updates);
         },
+        saveToStorage() {
+            localStorage.setItem('column1', JSON.stringify(this.taskColumns[0].taskCards));
+            localStorage.setItem('column2', JSON.stringify(this.taskColumns[1].taskCards));
+            localStorage.setItem('column3', JSON.stringify(this.taskColumns[2].taskCards));
+        },
+        loadFromStorage() {
+            this.taskColumns[0].taskCards = JSON.parse(localStorage.getItem('column1')) || [];
+            this.taskColumns[1].taskCards = JSON.parse(localStorage.getItem('column2')) || [];
+            this.taskColumns[2].taskCards = JSON.parse(localStorage.getItem('column3')) || [];
+        },
+    },
+    mounted() {
+        this.loadFromStorage();
     },
     template: `
     <div class="task-container">
